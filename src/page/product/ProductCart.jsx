@@ -13,10 +13,10 @@ const ProductCart = ({ data }) => {
   const navigate = useNavigate();
 
 
-    const addTocart = (product) => {
-      if (!user) {
-        return navigate('/signup')
-      }
+  const addTocart = (product) => {
+    if (!user) {
+      return navigate('/signup')
+    }
     dispatch({
       type: 'ADD_TO_CART',
       payload: product
@@ -40,8 +40,7 @@ const ProductCart = ({ data }) => {
       <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner'>
         <img
           className='group-hover:scale-105 duration-500 object-contain h-full max-w-full transition-transform'
-          src={ data?.image?.replace("http://", "https://")|| data?.thumbnail?.replace("http://", "https://") || data?.image?.replace("http://", "https://")}
-          alt={data?.title}
+          src={(data?.image || data?.images?.[0] || data?.thumbnail || "")?.replace("http://", "https://")} alt={data?.title}
         />
       </div>
 
