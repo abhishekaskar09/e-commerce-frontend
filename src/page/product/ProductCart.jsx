@@ -29,14 +29,16 @@ const ProductCart = ({ data }) => {
   return (
     <div className='group relative bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover:shadow-indigo-500/5 hover:border-slate-700/80 transition-all duration-300 transform hover:-translate-y-1 h-[430px]'>
 
-      {/* 1. Image Container (FIXED: Rendered size 0x0px collapse issue resolved) */}
+      {/* 1. Image Container (FIXED: Wrapper div added to stop flex collapse) */}
       <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner'>
-        <img
-          className='group-hover:scale-105 duration-500 object-contain w-full h-full max-h-40 transition-transform block'
-          src={data?.image || data?.images?.[0] || data?.thumbnail}
-          alt={data?.title || "Product Image"}
-          loading="lazy"
-        />
+        <div className='w-full h-full relative block'>
+          <img
+            className='absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105'
+            src={data?.image || data?.images?.[0] || data?.thumbnail}
+            alt={data?.title || "Product Image"}
+            loading="lazy"
+          />
+        </div>
       </div>
 
       {/* 2. Content Container */}
