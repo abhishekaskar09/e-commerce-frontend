@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+ import React, { useContext, useState } from 'react'
 import { CartContext } from '../../context/CartContext';
 import { useNavigate } from 'react-router';
 import { AuthContext } from '../../context/AuthContext';
@@ -6,12 +6,8 @@ import { AuthContext } from '../../context/AuthContext';
 const ProductCart = ({ data }) => {
   const { dispatch } = useContext(CartContext);
   const { user } = useContext(AuthContext);
-
   const [loading, setLoading] = useState(false);
-
-
   const navigate = useNavigate();
-
 
   const addTocart = (product) => {
     if (!user) {
@@ -23,8 +19,6 @@ const ProductCart = ({ data }) => {
     });
   }
 
-
-
   const laodingFunction = () => {
     setLoading(true)
     setTimeout(() => {
@@ -32,36 +26,37 @@ const ProductCart = ({ data }) => {
     }, 1000);
   }
 
-
   return (
     <div className='group relative bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover:shadow-indigo-500/5 hover:border-slate-700/80 transition-all duration-300 transform hover:-translate-y-1 h-[430px]'>
 
-      {/* 1.  image con container */}
-      <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner'>
+      {/* 1. Image Container (FIXED: Rendered size 0x0px collapse issue resolved) */}
+      <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner block'>
         <img
-          className='group-hover:scale-105 duration-500 object-contain h-full max-w-full transition-transform'
-          src={(data?.image || data?.images?.[0] || data?.thumbnail || "")?.replace("http://", "https://")} alt={data?.title}
+          className='group-hover:scale-105 duration-500 object-contain w-full h-full max-h-40 transition-transform block'
+          src={data?.image || data?.images?.[0] || data?.thumbnail}
+          alt={data?.title || "Product Image"}
+          loading="lazy"
         />
       </div>
 
+      {/* 2. Content Container */}
       <div className='flex flex-col flex-grow mt-4 justify-start'>
-
         <span className='text-xs text-indigo-400 font-bold uppercase tracking-wider mb-1 block'>
           {data?.category || "General"}
         </span>
 
-        {/* title */}
+        {/* Title */}
         <h2 className='font-bold text-lg text-slate-100 line-clamp-1 group-hover:text-indigo-400 transition-colors duration-200'>
           {data?.title}
         </h2>
 
-        {/* description */}
+        {/* Description */}
         <p className='text-sm text-slate-400 font-medium line-clamp-2 mt-1 leading-relaxed'>
           {data?.description}
         </p>
       </div>
 
-      {/* 3. price, rating and button */}
+      {/* 3. Price, Rating and Button */}
       <div className='mt-4 pt-3 border-t border-slate-800/60'>
         <div className='flex justify-between items-center mb-3'>
           <div>
@@ -70,7 +65,8 @@ const ProductCart = ({ data }) => {
               ₹{data?.price}
             </h3>
           </div>
-          {/* rating */}
+          
+          {/* Rating */}
           <div className='flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800'>
             <span className='text-yellow-400 text-xs'>⭐</span>
             <span className='font-bold text-xs text-slate-200'>
@@ -79,13 +75,15 @@ const ProductCart = ({ data }) => {
           </div>
         </div>
 
-        {/* button */}
-        <button className={`w-full ${loading ? "bg-green-500/50 duration-300" : "bg-indigo-600 hover:bg-indigo-500"}  text-white font-semibold py-2.5 px-4 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm shadow-md shadow-indigo-600/10`}
+        {/* Button */}
+        <button 
+          className={`w-full ${loading ? "bg-green-500/50 duration-300" : "bg-indigo-600 hover:bg-indigo-500"} text-white font-semibold py-2.5 px-4 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm shadow-md shadow-indigo-600/10`}
           onClick={() => {
-            addTocart(data)
+            addTocart(data);
             laodingFunction();
-          }}>
-          {loading ? <p className='text-xl font-semibold '>👍Added</p> : <p>Add to Cart</p>}
+          }}
+        >
+          {loading ? <span className='text-xl font-semibold '>👍Added</span> : <span>Add to Cart</span>}
         </button>
       </div>
 
