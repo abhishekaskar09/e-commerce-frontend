@@ -1,21 +1,24 @@
-import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router";
-import { LoginSchema } from "../zod/LoginSchema";
-import { FaEyeSlash } from "react-icons/fa";
-import { FaEye } from "react-icons/fa";
-import { TodoContext } from "../context/Context";
- 
-const Signup = () => {
-  const { setLogout } = useContext(TodoContext)
-  const [success, setSuccess] = useState(false);
-  const [confirm, setConfirm] = useState(false);
-  const [showEye, setShowEye] = useState(false);
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import { signupSchema } from '../zod/SignupSchema';
+import { AuthContext } from '../context/AuthContext';
 
-  const [signup, setSignup] = useState({ name: "", email: "", password: "" });
+import { FaEyeSlash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa6";
+
+const Signup = () => {
+
+  const { dispatch, setSignup, signup } = useContext(AuthContext);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
-  const handlesave = (e) => {
+
+
+  const handleSave = (e) => {
     setSignup({ ...signup, [e.target.name]: e.target.value });
     if (error[e.target.name]) {
       setError({ ...error, [e.target.name]: "" });
@@ -23,144 +26,177 @@ const Signup = () => {
   };
 
 
-
-
-
-  const handleForm = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    const result = LoginSchema.safeParse(signup);
+    try {
+      const result = await signupSchema.safeParse(signup);
 
-    if (!result.success) {
-      const existing = {};
-      result.error.issues.forEach((item) => { existing[item.path[0]] = item.message; });
-      setError(existing);
-      return;
+      if (!result.success) {
+        const formettedErrors = result?.error?.issues.reduce((accum, item) => {
+          const fieldName = item.path[0];
+          if (!accum[fieldName]) {
+            accum[fieldName] = item.message;
+          }
+          return accum;
+        }, {});
+
+        return setError(formettedErrors);
+      }
+
+      setError({});
+
+      setIsLoading(true);
+      setTimeout(() => {
+        const mockUserData = {
+          name: signup.name,
+          email: signup.email,
+          password: signup.password,
+        }
+
+        dispatch({
+          type: 'SIGN_UP',
+          payload: mockUserData,
+        });
+
+        setIsLoading(false);
+        navigate('/');
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
     }
-
-    const displayName = signup.email.split('@')[0];
-
-    const existingData = localStorage.getItem("signup");
-    const users = existingData ? JSON.parse(existingData) : [];
-
-    const usersArray = Array.isArray(users) ? users : [users];
-
-    const updatedUsers = [...usersArray, { ...signup, displayName }];
-    localStorage.setItem("signup", JSON.stringify(updatedUsers));
-
-    localStorage.setItem("login", JSON.stringify({ ...signup, displayName }));
-
-
- 
-    setSuccess(true);
-    setLogout(true);
-
-    setTimeout(() => {
-      setSuccess(false);
-    }, 2000);
-
-    setConfirm(true);
-    setTimeout(() => {
-      setConfirm(false)
-      navigate('/');
-    }, 4000);
-
-
   };
 
   return (
-    <div className="mt-0 min-h-screen flex items-center justify-center bg-[#0a191e] p-6">
-      {/* Main Card */}
-      <div className="w-full max-w-md bg-[#152b31] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[40px] p-10 border border-white/5 relative overflow-hidden">
+    <div className="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800/80 p-8 rounded-2xl shadow-xl shadow-slate-950/50 backdrop-blur-sm">
 
-        {/* Background Glow Decorations */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-600/20 blur-[60px] rounded-full"></div>
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full"></div>
-
-        <div className="relative z-10">
-          <h2 className="text-4xl font-black mb-2 text-white tracking-tighter text-center">
-            Welcome Back
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-black tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent">
+            Create Account
           </h2>
-          <p className="text-gray-400 text-center text-sm mb-10 font-medium">
-            Signup Create Account 🚀
+          <p className="text-slate-500 text-xs font-medium mt-1.5 uppercase tracking-wider">
+            Join us to get original premium gear
           </p>
-
-          <form onSubmit={handleForm} className="space-y-6">
-            {/* Name Field */}
-
-            <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Name</label>
-              <input
-                className={`w-full bg-[#0d1e24] p-4 rounded-2xl text-white outline-none border-2 transition-all duration-300 ${error.email ? 'border-red-500/50' : 'border-white/5 focus:border-green-500/50'}`}
-                type="text"
-                name="name"
-                value={signup.name}
-                placeholder="Enter Your Name"
-                onChange={handlesave}
-              />
-              {error.name && <p className="text-[10px] text-red-400 font-bold uppercase ml-2 tracking-tighter animate-bounce">{error.email}</p>}
-            </div>
-
-            {/* Email Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-              <input
-                className={`w-full bg-[#0d1e24] p-4 rounded-2xl text-white outline-none border-2 transition-all duration-300 ${error.email ? 'border-red-500/50' : 'border-white/5 focus:border-green-500/50'}`}
-                type="text"
-                name="email"
-                value={signup.email}
-                placeholder="name@example.com"
-                onChange={handlesave}
-              />
-              {error.email && <p className="text-[10px] text-red-400 font-bold uppercase ml-2 tracking-tighter animate-bounce">{error.email}</p>}
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Password</label>
-              <div className="relative group">
-                <input
-                  className={`w-full bg-[#0d1e24] p-4 rounded-2xl text-white outline-none border-2 transition-all duration-300 ${error.password ? 'border-red-500/50' : 'border-white/5 focus:border-green-500/50'}`}
-                  type={showEye ? "text" : "password"}
-                  name="password"
-                  value={signup.password}
-                  placeholder="••••••••"
-                  onChange={handlesave}
-                />
-                {error.password && <p className="text-[10px] text-red-400 font-bold uppercase ml-2 tracking-tighter animate-bounce">{error.password}</p>}
-                <button type="button" className="absolute right-4 top-6 text-white" onClick={() => setShowEye(!showEye)}>{showEye ? <FaEyeSlash /> : <FaEye />}</button>
-              </div>
-            </div>
-
-            {/* signup Button */}
-            <button
-              type="submit"
-              disabled={success || confirm}
-              className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-500 relative overflow-hidden group 
-                 ${success ? 'bg-green-600' : confirm ? 'bg-cyan-900 scale-105 shadow-[0_0_30px_rgba(8,145,178,0.3)]' : 'bg-green-600 hover:bg-green-500 hover:shadow-[0_10px_20px_rgba(22,163,74,0.3)] active:scale-95 text-white'}`}
-            >
-              {success ? (
-                <div className="flex justify-center items-center gap-2">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-                  <span>Verifying...</span>
-                </div>
-              ) : confirm ? (
-                <span className="animate-pulse">Singup Successful!</span>
-              ) : (
-                <span>Signup</span>
-              )}
-            </button>
-
-            {/* Footer Link */}
-            <div className="text-center pt-4">
-              <p className="text-gray-500 text-sm font-medium">
-                Already Account
-                <a href="/login" className="text-green-500 font-black ml-2 hover:underline decoration-2 underline-offset-4 transition-all">
-                  Go to Loign
-                </a>
-              </p>
-            </div>
-          </form>
         </div>
+
+        <form className="flex flex-col gap-4" onSubmit={handleSignup}>
+
+          {/* 1. FULL NAME */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              placeholder="John Doe"
+              className={`bg-slate-950 border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all duration-200 ${error.name ? 'border-rose-500/80 focus:ring-rose-500/30' : 'border-slate-800 focus:border-indigo-500/80 focus:ring-indigo-500/30'
+                }`}
+              disabled={isLoading}
+
+              value={signup.name}
+              onChange={handleSave}
+            />
+            {error.name && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.name}</p>}
+          </div>
+
+          {/* 2. EMAIL ADDRESS */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="name@company.com"
+              className={`bg-slate-950 border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all duration-200 ${error.email ? 'border-rose-500/80 focus:ring-rose-500/30' : 'border-slate-800 focus:border-indigo-500/80 focus:ring-indigo-500/30'
+                }`}
+              disabled={isLoading}
+
+              value={signup.email}
+              onChange={handleSave}
+            />
+            {error.email && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.email}</p>}
+          </div>
+
+          {/* 3. PASSWORD */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                Password
+              </label>
+            </div>
+
+            <div className="relative w-full">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
+                disabled={isLoading}
+                value={signup.password}
+                onChange={handleSave}
+              />
+
+              <button
+                type="button" // ⚡  
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+              >
+                {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+              </button>
+            </div>
+
+            {error.password && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.password}</p>}
+          </div>
+
+          {/* TERMS & CONDITIONS */}
+          <div className="flex items-center gap-2 mt-1 px-0.5">
+            <input
+              type="checkbox"
+              id="terms"
+              className="accent-indigo-600 h-4 w-4 rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-0 cursor-pointer"
+              disabled={isLoading}
+
+            />
+            <label htmlFor="terms" className="text-xs text-slate-400 font-medium cursor-pointer select-none">
+              I agree to the <a href="#" className="text-indigo-400 font-semibold hover:underline">Terms</a> and <a href="#" className="text-indigo-400 font-semibold hover:underline">Privacy Policy</a>
+            </label>
+          </div>
+
+          {/* PROCESSING BUTTON */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`w-full mt-2 text-white font-extrabold text-sm uppercase tracking-wider py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 ${isLoading
+                ? 'bg-indigo-600/50 cursor-not-allowed text-indigo-200'
+                : 'bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] shadow-lg shadow-indigo-600/10'
+              }`}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <span>Register Now</span>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-8 pt-6 border-t border-slate-800/60 text-center">
+          <p className="text-xs text-slate-500 font-medium">
+            Already have an account?{' '}
+            <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">
+              Sign In
+            </Link>
+          </p>
+        </div>
+
       </div>
     </div>
   );

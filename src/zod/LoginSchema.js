@@ -1,6 +1,17 @@
-import z from "zod";
+ import { z } from 'zod';
 
-export const LoginSchema=z.object({
-   email: z.string().nonempty({message:'Enter Your email'}).email({message:"Invalid email address"}),
-  password: z.string().nonempty({message:'Enter Your password'}).min(6, {message:"Password must be at least 6 characters"}),
-})
+ export const LoginSchema = z.object({  
+ // email
+  email: z
+    .string()
+    .min(1, { message: 'Enter your Email' })
+    .email({ message: 'Invalid Email Format' }),
+
+// password
+  password: z
+    .string()
+    .min(1, { message: 'Enter your Password' })
+    .min(6, { message: 'Password must be at least 6 characters' }),
+});
+
+ 

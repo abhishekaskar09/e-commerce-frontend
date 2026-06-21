@@ -1,127 +1,168 @@
- import React, { useContext, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
-import { LoginSchema } from "../zod/LoginSchema";
-import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { TodoContext } from "../context/Context";
- 
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import { LoginSchema } from '../zod/LoginSchema';
+import { AuthContext } from '../context/AuthContext';
+import { FaEyeSlash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa6";
+
 const Login = () => {
-  const { login, setLogin, loginUser, setLogout } = useContext(TodoContext);
-  const [success, setSuccess] = useState(false);
-  const [confirm, setConfirm] = useState(false);
-  const [showEye, setShowEye] = useState(false);
-  const [error, setError] = useState({});
-  const [authError, setAuthError] = useState("");  
 
+    const {dispatch,setSignup,signup,login,setLogin}=useContext(AuthContext);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const destination = location.state?.from?.pathname || "/";
-
-  const handlesave = (e) => {
+  const [error, setError] = useState({});
+ 
+  const handleSave = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
     if (error[e.target.name]) {
       setError({ ...error, [e.target.name]: "" });
     }
-    if (authError) setAuthError("");  
-  };
+  }
 
-  const handleForm = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError({});
-    setAuthError(""); 
+    try {
+      const result = await LoginSchema.safeParse(login);
 
-    // 1. Zod Validation
-    const result = LoginSchema.safeParse(login);
-    if (!result.success) {
-      const existing = {};
-      result.error.issues.forEach((item) => {
-        existing[item.path[0]] = item.message;
-      });
-      setError(existing);
-      return;
-    }
+      if (!result.success) {
+        const formettedErrors = result?.error?.issues?.reduce((accum, item) => {
+          const fieldName = item.path[0];
+          if (!accum[fieldName]) {
+            accum[fieldName] = item.message;
+          }
+          return accum;
+        }, {});
+        setError(formettedErrors);
+        return;
+      }
 
-    // 2. Context Login Logic
-    const response = loginUser(login, destination, navigate);
 
-    if (response.success === true) { 
-      setLogin({ email: "", password: "" });
-      setSuccess(true);
-      setLogout(true);
-      setTimeout(() => setSuccess(false), 2000);
+      if (login.email!==signup.email) {
+        setError({email:"email invalid"});
+        return;
+      }
 
-      setConfirm(true);
+        if (login.password!==signup.password) {
+        setError({password:"password does not matched"});
+        return;
+      }
+
+
+      setError({});
+      setIsLoading(true);
       setTimeout(() => {
-        setConfirm(false);
-        navigate('/')
-      }, 4000);
-    } else {
-   
-      setAuthError(response.message || "Invalid credentials. Please try again.");
-      setSuccess(false)
-      setConfirm(false)
+            const mockUserData={
+           email:login.email,
+          password:login.password,
+        }
+
+        dispatch({
+          type:'LOGIN',
+          payload:mockUserData,
+        });
+        setIsLoading(false);
+        navigate('/');
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a191e] p-6">
-      <div className="w-full max-w-md bg-[#152b31] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[40px] p-10 border border-white/5 relative overflow-hidden">
-        
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-600/20 blur-[60px] rounded-full"></div>
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-600/20 blur-[60px] rounded-full"></div>
+    <div className="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800/80 p-8 rounded-2xl shadow-xl shadow-slate-950/50 backdrop-blur-sm">
 
-        <div className="relative z-10">
-          <h2 className="text-4xl font-black mb-2 text-white tracking-tighter text-center">Welcome Back</h2>
-          <p className="text-gray-400 text-center text-sm mb-10 font-medium tracking-tight">Login to continue your shopping spree 🚀</p>
-
-          <form onSubmit={handleForm} className="space-y-6">
-            {/* Email Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-              <input
-                className={`w-full bg-[#0d1e24] p-4 rounded-2xl text-white outline-none border-2 transition-all duration-300 ${error.email ? 'border-red-500/50' : 'border-white/5 focus:border-green-500/50'}`}
-                type="text" name="email" value={login.email} placeholder="name@example.com" onChange={handlesave}
-              />
-              {error.email && <p className="text-[10px] text-red-400 font-bold uppercase ml-2 tracking-tighter">{error.email}</p>}
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Password</label>
-              <div className="relative group">
-                <input
-                  className={`w-full bg-[#0d1e24] p-4 rounded-2xl text-white outline-none border-2 transition-all duration-300 ${error.password ? 'border-red-500/50' : 'border-white/5 focus:border-green-500/50'}`}
-                  type={showEye ? "text" : "password"} name="password" value={login.password} placeholder="••••••••" onChange={handlesave}
-                />
-                <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white" onClick={() => setShowEye(!showEye)}>
-                  {showEye ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-                </button>
-              </div>
-              {error.password && <p className="text-[10px] text-red-400 font-bold uppercase ml-2 tracking-tighter">{error.password}</p>}
-            </div>
-
-            {/* 🚨 Wrong Credentials Message */}
-            {authError && (
-              <p className="text-[10px] text-red-400 font-black uppercase text-center bg-red-500/10 py-3 rounded-xl border border-red-500/20 tracking-widest animate-pulse">
-                {authError}
-              </p>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit" disabled={success || confirm}
-              className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-500 
-                ${success ? 'bg-green-600' : confirm ? 'bg-cyan-900 scale-105 shadow-[0_0_20px_rgba(8,145,178,0.3)]' : 'bg-green-600 hover:bg-green-500 active:scale-95 text-white shadow-lg shadow-green-900/20'}`}
-            >
-              {success ? "Verifying..." : confirm ? "Success!" : "Login"}
-            </button>
-
-            <div className="text-center pt-4">
-              <p className="text-gray-500 text-sm font-medium">Don't have an account?
-                <a href="/signup" className="text-green-500 font-black ml-2 hover:underline decoration-2 underline-offset-4">Create One</a>
-              </p>
-            </div>
-          </form>
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-black tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent">
+            Welcome Back
+          </h2>
+          <p className="text-slate-500 text-xs font-medium mt-1.5 uppercase tracking-wider">
+            Login to access your premium dashboard
+          </p>
         </div>
+
+        <form className="flex flex-col gap-5" onSubmit={handleLogin}>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+              Email Address
+            </label>
+            <input
+              type="text"
+              name='email'
+              placeholder="name@company.com"
+              className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
+              disabled={isLoading}
+              value={login.email}
+              onChange={handleSave}
+            />
+            {error.email && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.email}</p>}
+
+          </div>
+ <div className="flex flex-col gap-1.5">
+  <div className="flex justify-between items-center">
+    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+      Password
+    </label>
+  </div>
+
+   <div className="relative w-full">
+    <input
+       type={showPassword ? "text" : "password"}
+      name="password"
+      placeholder="••••••••"
+      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
+      disabled={isLoading}
+      value={login.password}
+      onChange={handleSave}
+    />
+    
+     <button
+      type="button" // ⚡  
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+    >
+      {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+    </button>
+  </div>
+
+  {error.password && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.password}</p>}
+</div>
+          {/* ⚡ PROCESSING BUTTON CONTAINER */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`w-full mt-2 text-white font-extrabold text-sm uppercase tracking-wider py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 ${isLoading
+              ? 'bg-indigo-600/50 cursor-not-allowed text-indigo-200'
+              : 'bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] shadow-lg shadow-indigo-600/10'
+              }`}
+          >
+            {isLoading ? (
+              <>
+                {/* MODERN LOADING SPIN ICON */}
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Processing...</span>
+              </>
+            ) : (
+              <span>Login</span>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-8 pt-6 border-t border-slate-800/60 text-center">
+          <p className="text-xs text-slate-500 font-medium">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors">
+              Create Account
+            </Link>
+          </p>
+        </div>
+
       </div>
     </div>
   );

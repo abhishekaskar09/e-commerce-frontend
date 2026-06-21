@@ -1,18 +1,18 @@
-import React from 'react'
-import { Outlet, Route, Routes } from 'react-router';
-import Navbar from './components/Navbar';
+ import React from 'react'
+import { Outlet } from 'react-router'
+import Navbar from './Components/Navbar'
+import Footer from './Components/Footer'
  
-
-const App = () => {
-
-  return (
-    <div className='bg-[#234829]'>
-      <Navbar/>
-      <div>
-        <Outlet />
-      </div>
-    </div>
-  )
-}
-
-export default App
+ const App = () => {
+   return (
+     <div className='bg-slate-700'>
+    <Navbar/>
+      <main>
+        <Outlet/>
+      </main>
+      <Footer/>
+     </div>
+   )
+ }
+ 
+ export default App

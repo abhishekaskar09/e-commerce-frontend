@@ -1,28 +1,26 @@
 import { createBrowserRouter } from "react-router";
-import Cart from "./pages/cart/Cart";
- import App from "./App";
-import CheckOut from "./pages/checkout/CheckOut";
-import Payment from "./pages/payment/Payment";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
- import Orders from "./pages/orders/Orders";
-import Product from "./pages/product/Product";
-import Details from "./pages/details/Details";
+import App from "./App";
+import Product from "./page/product/Product";
+import Cart from "./page/cart/Cart";
+import Login from "./Components/Login";
+import Signup from "./Components/Signup";
+import Checkout from "./page/Feature/Checkout";
+import Payment from "./page/payment/Payment";
+import OrderHistory from "./page/order/Orders";
+
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
-      { path: '/', element: <Product/> },
+      { path: '/', element: <Product /> },
       { path: '/cart', element: <Cart /> },
-      { path: '/checkout', element:<CheckOut /> },
-      { path: '/payment', element:<Payment /> },
-      { path: '/orders', element: <Orders />  },
-      { path: '/signup', element: <Signup /> },
       { path: '/login', element: <Login /> },
-      { path: '/productDetails/:id', element: <Details/> },
-
+      { path: '/signup', element: <Signup /> },
+      { path: '/checkout', element: <Checkout/> },
+      { path: '/payment', element: <Payment/> },
+      { path: '/orders', element: <OrderHistory/> },
     ]
   }
 ])
