@@ -30,7 +30,7 @@ const ProductCart = ({ data }) => {
     <div className='group relative bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover:shadow-indigo-500/5 hover:border-slate-700/80 transition-all duration-300 transform hover:-translate-y-1 h-[430px]'>
 
       {/* 1. Image Container (FIXED: Rendered size 0x0px collapse issue resolved) */}
-      <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner block'>
+      <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner'>
         <img
           className='group-hover:scale-105 duration-500 object-contain w-full h-full max-h-40 transition-transform block'
           src={data?.image || data?.images?.[0] || data?.thumbnail}
