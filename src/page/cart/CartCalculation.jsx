@@ -7,7 +7,7 @@ const CartCalculation = () => {
 
   const [loadingMessage, setLoadingMessage] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
   const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
