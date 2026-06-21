@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { CartContext } from "../../context/CartContext";
 import CheckoutItems from "./CheckoutItems";
-import Address from "../../Components/Address";
+import Address from "../../components/Address";
 
 const Checkout = () => {
   const { cart } = useContext(CartContext);
