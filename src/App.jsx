@@ -1,18 +1,18 @@
- import React from 'react'
+import React from 'react'
 import { Outlet } from 'react-router'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
- 
- const App = () => {
-   return (
-     <div className='bg-slate-700'>
-    <Navbar/>
+
+const App = () => {
+  return (
+    <div className='bg-slate-700'>
+      <Navbar />
       <main>
-        <Outlet/>
+        <Outlet />
       </main>
-      <Footer/>
-     </div>
-   )
- }
- 
- export default App
+      <Footer />
+    </div>
+  )
+}
+
+export default App

@@ -7,6 +7,7 @@ import Signup from "./components/Signup";
 import Checkout from "./page/Feature/Checkout";
 import Payment from "./page/payment/Payment";
 import OrderHistory from "./page/order/Orders";
+import ProductDetails from "./page/product/ProductDetails";
 
 
 export const router = createBrowserRouter([
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: '/', element: <Product /> },
+      { path: '/productDetails/:id', element: <ProductDetails/>},
       { path: '/cart', element: <Cart /> },
       { path: '/login', element: <Login /> },
       { path: '/signup', element: <Signup /> },

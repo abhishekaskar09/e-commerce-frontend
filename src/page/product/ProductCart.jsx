@@ -1,6 +1,6 @@
- import React, { useContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { CartContext } from '../../context/CartContext';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProductCart = ({ data }) => {
@@ -32,12 +32,13 @@ const ProductCart = ({ data }) => {
       {/* 1. Image Container (FIXED: Wrapper div added to stop flex collapse) */}
       <div className='w-full h-44 bg-white p-4 flex justify-center items-center rounded-xl overflow-hidden shadow-inner'>
         <div className='w-full h-full relative block'>
-          <img
+          <Link to={`/productDetails/${data?.id}`}>
+           <img
             className='absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105'
             src={data?.image || data?.images?.[0] || data?.thumbnail}
             alt={data?.title || "Product Image"}
             loading="lazy"
-          />
+          /></Link>
         </div>
       </div>
 
@@ -62,12 +63,11 @@ const ProductCart = ({ data }) => {
       <div className='mt-4 pt-3 border-t border-slate-800/60'>
         <div className='flex justify-between items-center mb-3'>
           <div>
-            <span className='text-xs text-slate-500 block font-medium'>Price</span>
             <h3 className='text-xl font-extrabold text-emerald-400 font-sans'>
               ₹{data?.price}
             </h3>
           </div>
-          
+
           {/* Rating */}
           <div className='flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800'>
             <span className='text-yellow-400 text-xs'>⭐</span>
@@ -78,14 +78,14 @@ const ProductCart = ({ data }) => {
         </div>
 
         {/* Button */}
-        <button 
+        <button
           className={`w-full ${loading ? "bg-green-500/50 duration-300" : "bg-indigo-600 hover:bg-indigo-500"} text-white font-semibold py-2.5 px-4 rounded-xl active:scale-[0.98] transition-all duration-200 text-sm shadow-md shadow-indigo-600/10`}
           onClick={() => {
             addTocart(data);
             laodingFunction();
           }}
         >
-          {loading ? <span className='text-xl font-semibold '>👍Added</span> : <span>Add to Cart</span>}
+          {loading ? <span className='text-xl font-semibold '>{user ? "👍Added" : ""}</span> : <span>Add to Cart</span>}
         </button>
       </div>
 

@@ -7,19 +7,19 @@ import { FaEye } from "react-icons/fa6";
 
 const Login = () => {
 
-    const {dispatch,setSignup,signup,login,setLogin}=useContext(AuthContext);
-  
+  const { dispatch, setSignup, signup, login, setLogin } = useContext(AuthContext);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState({});
- 
+
   const handleSave = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
     if (error[e.target.name]) {
       setError({ ...error, [e.target.name]: "" });
     }
-  }
+  } 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,13 +39,13 @@ const Login = () => {
       }
 
 
-      if (login.email!==signup.email) {
-        setError({email:"email invalid"});
+      if (login.email !== signup.email) {
+        setError({ email: "email invalid" });
         return;
       }
 
-        if (login.password!==signup.password) {
-        setError({password:"password does not matched"});
+      if (login.password !== signup.password) {
+        setError({ password: "password does not matched" });
         return;
       }
 
@@ -53,14 +53,14 @@ const Login = () => {
       setError({});
       setIsLoading(true);
       setTimeout(() => {
-            const mockUserData={
-           email:login.email,
-          password:login.password,
+        const mockUserData = {
+          email: login.email,
+          password: login.password,
         }
 
         dispatch({
-          type:'LOGIN',
-          payload:mockUserData,
+          type: 'LOGIN',
+          payload: mockUserData,
         });
         setIsLoading(false);
         navigate('/');
@@ -101,35 +101,35 @@ const Login = () => {
             {error.email && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.email}</p>}
 
           </div>
- <div className="flex flex-col gap-1.5">
-  <div className="flex justify-between items-center">
-    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
-      Password
-    </label>
-  </div>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                Password
+              </label>
+            </div>
 
-   <div className="relative w-full">
-    <input
-       type={showPassword ? "text" : "password"}
-      name="password"
-      placeholder="••••••••"
-      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
-      disabled={isLoading}
-      value={login.password}
-      onChange={handleSave}
-    />
-    
-     <button
-      type="button" // ⚡  
-      onClick={() => setShowPassword(!showPassword)}
-      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
-    >
-      {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
-    </button>
-  </div>
+            <div className="relative w-full">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
+                disabled={isLoading}
+                value={login.password}
+                onChange={handleSave}
+              />
 
-  {error.password && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.password}</p>}
-</div>
+              <button
+                type="button" // ⚡  
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+              >
+                {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+              </button>
+            </div>
+
+            {error.password && <p className="text-xs text-rose-400 font-medium px-1 mt-0.5">{error.password}</p>}
+          </div>
           {/* ⚡ PROCESSING BUTTON CONTAINER */}
           <button
             type="submit"

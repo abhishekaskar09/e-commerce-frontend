@@ -25,7 +25,7 @@ const Address = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const result = await addressSchema.safeParse(address);
+      const result =   addressSchema.safeParse(address);
       if (!result.success) {
         const formettedErrors = result?.error?.issues?.reduce((accum, item) => {
           const fieldName = item.path[0];

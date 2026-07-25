@@ -6,8 +6,7 @@ const Product = () => {
   const { product, search, category } = useContext(ProductContext);
   const [pagination, setPagination] = useState(1);
   console.log(pagination);
-
-  const [limit, setLimit] = useState(8);
+  const limit=8;
 
 
   const dataFiltered = product.filter((item) => {
@@ -21,6 +20,7 @@ const Product = () => {
   const lastPage = pagination * limit;
   const firstPage = lastPage - limit;
   const currentPage = dataFiltered?.slice(firstPage, lastPage);
+  
   const totalPage = Math.ceil(dataFiltered?.length / limit);
 
  
