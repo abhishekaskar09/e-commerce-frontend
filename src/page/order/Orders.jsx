@@ -1,17 +1,18 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-     const savedOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    const savedOrders = JSON.parse(localStorage.getItem('orders')) || [];
     setOrders(savedOrders);
   }, []);
 
+  
   return (
     <div className="min-h-screen bg-[#0b0f19] text-slate-100 p-4 md:p-10 font-sans selection:bg-indigo-500/30">
       <div className="max-w-5xl mx-auto">
-        
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800/60 pb-6 mb-8">
           <div>
@@ -30,16 +31,16 @@ const OrderHistory = () => {
 
         {/* Orders Stack */}
         <div className="space-y-8">
-          
+
           {/* ⚡ If no orders found */}
           {orders.length === 0 ? (
             <div className="text-center py-20 bg-slate-900/20 border border-dashed border-slate-800 rounded-2xl">
               <p className="text-slate-400 font-medium">No orders found yet.</p>
             </div>
           ) : (
-             orders.map((order) => (
+            orders.map((order) => (
               <div key={order.id} className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:border-slate-700/60">
-                
+
                 {/* Meta Top Header */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-900/90 px-6 py-5 border-b border-slate-800/80 text-xs">
                   <div>
@@ -56,11 +57,10 @@ const OrderHistory = () => {
                   </div>
                   {/* Status Badge According to Order Status */}
                   <div className="text-right flex flex-col items-start sm:items-end justify-center">
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full shadow-inner ${
-                      order.status === 'Delivered' 
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full shadow-inner ${order.status === 'Delivered'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                         : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                    }`}>
+                      }`}>
                       <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${order.status === 'Delivered' ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
                       {order.status}
                     </span>
@@ -69,14 +69,14 @@ const OrderHistory = () => {
 
                 {/* Order Items Wrapper */}
                 <div className="p-6 divide-y divide-slate-800/40">
-                  
-                   {order.items && order.items.map((item) => (
+
+                  {order.items && order.items.map((item) => (
                     <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 pt-5 first:pt-0 last:pb-0">
                       <div className="flex items-center gap-5 w-full sm:w-auto">
                         {/* Image Frame */}
                         <div className="w-20 h-20 bg-slate-950 border border-slate-800 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center text-[10px] text-slate-600 font-mono relative">
                           <span className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-transparent opacity-60"></span>
-                           <img src={item?.thumbnail||item?.image||item?.images} alt={item?.title} />
+                          <img src={item?.thumbnail || item?.image || item?.images} alt={item?.title} />
                         </div>
                         <div className="min-w-0">
                           <h4 className="text-sm font-bold text-white tracking-wide truncate hover:text-indigo-400 transition-colors cursor-pointer">
